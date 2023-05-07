@@ -1,7 +1,14 @@
-const express = require("express");
-const app = express();
-const PORT = 4000;
+import express from 'express';
+import usersRoute from './src/routes/users.routes.js';
+import parkingLotsRoute from './src/routes/parking.lots.routes.js';
 
-app.listen(PORT, () => {
-    console.log("Server started in port", PORT);
-});
+const app = express();
+
+//middleware
+app.use(express.json());
+
+//routes
+app.use('/users', usersRoute);
+app.use('/parkinglots', parkingLotsRoute)
+
+export default app;
