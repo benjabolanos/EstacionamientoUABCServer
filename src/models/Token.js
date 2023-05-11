@@ -1,7 +1,8 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/connection.js";
+import { User } from "./User.js";
 
-export const User = sequelize.define('User', {
+export const Token = sequelize.define('Token', {
     id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -9,16 +10,21 @@ export const User = sequelize.define('User', {
         unique: true,
         autoIncrement: true,
     },
-    email: {
+    token: {
         type: DataTypes.STRING,
-        allowNull: false,
         unique: true,
-    },
-    number_id: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true
+        allowNull: false
     }
 }, {
     timestamps: false
+});
+
+User.hasOne(Token, {
+    foreignKey: 'user_id',
+    sourceKey: 'id'
+});
+
+Token.belongsTo(User, {
+    foreignKey: 'user_id',
+    targetKey: 'id'
 });

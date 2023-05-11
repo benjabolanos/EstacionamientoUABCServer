@@ -1,28 +1,33 @@
 import { Op } from "sequelize";
 import { User } from "../models/User.js";
 import { ParkingLot } from "../models/ParkingLot.js";
+import { Token } from "../models/Token.js";
+import { create_token } from "../encrypt.js";
 
 export const getUsers = (req, res) => {
     User.findAll({
         include: [{
             model: ParkingLot,
-            as: 'parkingLot'
+            as: 'ParkingLot'
         }]
     })
     .then((users) => {
-        res.json({users});
+        res.json(users);
     }).catch((error) => {
         res.status(500).json({message: error.message});
     });
 }
 
-export const createUser = (req, res) => {
-    User.create({email, number_id})
-    .then((user) => {
-        res.json({ user });
-    }).catch((error) => {
+export const createUser = async (req, res) => {
+    const { email, number_id } = req.body;
+
+    try {
+        const user = await User.create({email, number_id});
+        await create_uToken(number_id, user.id);
+        res.json(user);
+    } catch (error) {
         res.status(500).json({message: error.message});
-    });
+    }
 }
 
 export const getUserByNumberIdOrEmail = (req, res) => {
@@ -36,14 +41,14 @@ export const getUserByNumberIdOrEmail = (req, res) => {
             ]
         }, include: [{
             model: ParkingLot,
-            as: 'parkingLot'
+            as: 'ParkingLot'
         }]
     }).then((user) => {
         if(!user) {
-            return res.status(404).json({user});
+            return res.status(404).json(user);
         }
 
-        res.json({user});
+        res.json(user);
     }).catch((error) => {
         res.status(500).json({message: error.message});
     });
@@ -58,13 +63,39 @@ export const setUserParkingLot = async (req, res) => {
         if(!user) throw new Error('User not found');
 
         if (newParkingLot === 'null'){
-            await user.update({ number_id: null});
+            await user.update({ parking_id: -1});
         } else {
-            await user.update({ number_id: newParkingLot });
+            await user.update({ parking_id: newParkingLot });
         }
 
         res.json({message: 'User updated'});
     } catch (error) {
         res.status(500).json({message: error.message});
+    }
+}
+
+export const getUserToken = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        let token = await Token.findOne({where: {user_id: userId}})
+
+        if(!token) throw new Error('User not found');
+
+        res.json(token);
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+const create_uToken = async (value, userId) => {
+    try {
+        const token = create_token(value);
+        const userToken = await Token.create({token, user_id: userId});
+        return userToken
+    } catch (error) {
+        console.log('Token repeated.', error);
+        return await create_uToken(value);
     }
 }

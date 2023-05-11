@@ -30,13 +30,17 @@ export const ParkingLot = sequelize.define('ParkingLot', {
         allowNull: false,
     },
     latitude: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DOUBLE,
         allowNull: false,
     },
     longitude: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DOUBLE,
         allowNull: false,
-    }
+    }, 
+    type: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
 }, {
     timestamps: false
 });
@@ -44,9 +48,9 @@ export const ParkingLot = sequelize.define('ParkingLot', {
 ParkingLot.hasMany(User, {
     foreignKey: 'parking_id',
     sourceKey: 'id'
-})
+});
 
 User.belongsTo(ParkingLot, {
     foreignKey: 'parking_id',
     targetKey: 'id'
-})
+});
