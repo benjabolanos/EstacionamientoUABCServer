@@ -105,3 +105,21 @@ export const getParkingLotsWithCityAndFaculty = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 }
+
+export const getParkingCapacityAndAmount = async (req, res) => {
+    try {
+
+        const parkingLotId = req.params.parkingId;
+
+        const parkingLot = await ParkingLot.findOne({where: { id: parkingLotId }});
+        if(!parkingLot) throw new Error('Parking Lot not found');
+
+        const amount = await User.count( { where: { parking_id: parkingLot.id } });
+        
+        res.json({amount, capacity: parkingLot.capacity });
+
+    } catch(error) {
+        console.log(error);
+        res.status(500).json({message: error.message});
+    }
+}

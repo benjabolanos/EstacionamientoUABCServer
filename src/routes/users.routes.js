@@ -6,7 +6,7 @@ const router = Router();
 router.get('/', getUsers);
 router.get('/:query', getUserByNumberIdOrEmail);
 router.post('/', createUser);
-router.post('/:emai/parking/:parkingId', setUserParkingLot);
+router.get('/:token/parking/:parkingId', setUserParkingLot);
 router.get('/:userId/token', getUserToken);
 
 export default router;

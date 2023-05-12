@@ -57,19 +57,27 @@ export const getUserByNumberIdOrEmail = (req, res) => {
 export const setUserParkingLot = async (req, res) => {
     try {
         const newParkingLot = req.params.parkingId;
+        const userToken = req.params.token;
 
-        const user = await User.findOne({where: {email: req.params.email}});
+        console.log("User token:", userToken);
+        console.log("Parking Id:", newParkingLot)
 
+        const token = await Token.findOne({ where: {token: userToken} });
+        if(!token) throw new Error('Token not found');
+
+        const user = await User.findOne({where: {id: token.user_id}});
         if(!user) throw new Error('User not found');
 
         if (newParkingLot === 'null'){
-            await user.update({ parking_id: -1});
+            await user.update({ parking_id: null});
         } else {
             await user.update({ parking_id: newParkingLot });
         }
-
+        console.log("Exito al autorizar");
+        console.log(user.toJSON());
         res.json({message: 'User updated'});
     } catch (error) {
+        console.log("Error al autorizar", error.message);
         res.status(500).json({message: error.message});
     }
 }
