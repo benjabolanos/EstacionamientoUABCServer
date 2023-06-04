@@ -36,7 +36,7 @@ export const ParkingLot = sequelize.define('ParkingLot', {
     longitude: {
         type: DataTypes.DOUBLE,
         allowNull: false,
-    }, 
+    },
     type: {
         type: DataTypes.STRING,
         allowNull: false

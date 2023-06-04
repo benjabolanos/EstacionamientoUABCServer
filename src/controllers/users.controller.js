@@ -71,10 +71,15 @@ export const setUserParkingLot = async (req, res) => {
         if (newParkingLot === 'null'){
             await user.update({ parking_id: null});
         } else {
+            const parkingLot = await ParkingLot.findOne({where: {id: newParkingLot}});
+            if(!parkingLot) throw new Error('Parking Lot not found');
+
+            const amount = User.count({where: {parking_id: parkingLot.id}});
+            if(amount >= parkingLot.capacity) throw new Error('Parking Lot is full');
+
             await user.update({ parking_id: newParkingLot });
         }
-        console.log("Exito al autorizar");
-        console.log(user.toJSON());
+
         res.json({message: 'User updated'});
     } catch (error) {
         console.log("Error al autorizar", error.message);
