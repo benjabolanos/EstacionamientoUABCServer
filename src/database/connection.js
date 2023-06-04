@@ -9,6 +9,6 @@ export const sequelize = new Sequelize(
         host: 'localhost',
         dialect: 'mysql',
         operatorAlises: false,
-        dialectModule: mysql2
+        dialectModule: mysql2 //npm install mysql2
     }
 );
